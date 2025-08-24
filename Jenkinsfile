@@ -1,29 +1,23 @@
-pipeline{
-   agent any
-   stages{
-	stage('clean workspace')
-	{
-           steps{
-              sh ' rm -r *'
-	      sh ' rm -r ../../../../www/html/*'
-	   }
-	}
+pipeline {
+    agent any
 
-        stage('git scm clone'){
-             
-	     steps{
-                  
-		  sh ' git clone https://gitlab.com/9901845901dk/wedding.git -b beta '
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Deepak2330/Wedding.git'
+            }
+        }
 
-	     }
- 
-	}
-	stage('deploy'){
-              steps{
-                sh 'mv wedding/* ../../../../www/html'
-	      }
-	}
-     
-   }
-  
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t myapp:latest .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'docker run -d -p 8081:8080 --name myapp-container myapp:latest'
+            }
+        }
+    }
 }
